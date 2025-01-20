@@ -52,30 +52,22 @@ const average = (arr) =>
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
-
   return (
     <>
-      <Nav>
-        <Logo />
-        <Search />
-        <NumResults movies={movies} />
-      </Nav>
-      <Main>
-        <Box>
-          <MovieList movies={movies} />
-        </Box>
-        <Box>
-          <WatchedSummery watched={watched} />
-          <WatchedMovieList watched={watched} />
-        </Box>
-      </Main>
+      <Nav moviesLenght={movies.length} />
+      <Main movies={movies} />
     </>
   );
 }
 
-function Nav({ children }) {
-  return <nav className="nav-bar">{children}</nav>;
+function Nav({ moviesLenght }) {
+  return (
+    <nav className="nav-bar">
+      <Logo />
+      <Search />
+      <NumResults moviesLenght={moviesLenght} />
+    </nav>
+  );
 }
 
 function Logo() {
@@ -100,19 +92,24 @@ function Search() {
   );
 }
 
-function NumResults({ movies }) {
+function NumResults({ moviesLenght }) {
   return (
     <p className="num-results">
-      Found <strong>{movies.length}</strong> results
+      Found <strong>{moviesLenght}</strong> results
     </p>
   );
 }
 
-function Main({ children }) {
-  return <main className="main">{children}</main>;
+function Main({ movies }) {
+  return (
+    <main className="main">
+      <ListBox movies={movies} />
+      <WatchedBox />
+    </main>
+  );
 }
 
-function Box({ children }) {
+function ListBox({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -123,7 +120,7 @@ function Box({ children }) {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && children}
+      {isOpen1 && <MovieList movies={movies} />}
     </div>
   );
 }
@@ -153,7 +150,6 @@ function Movie({ movie }) {
   );
 }
 
-/*
 function WatchedBox() {
   const [watched, setWatched] = useState(tempWatchedData);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -168,13 +164,13 @@ function WatchedBox() {
       </button>
       {isOpen2 && (
         <>
-         
+          <WatchedSummery watched={watched} />
+          <WatchedMovieList watched={watched} />
         </>
       )}
     </div>
   );
 }
-*/
 
 function WatchedSummery({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
