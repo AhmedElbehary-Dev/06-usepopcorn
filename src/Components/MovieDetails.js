@@ -4,10 +4,20 @@ import Loader from "./Loader";
 import StarRating from "./StarRating";
 import { options } from "../config";
 
-export default function MovieDetails({ movieId, onCloseMove, onAddWatched }) {
+export default function MovieDetails({
+  movieId,
+  watched,
+  onCloseMove,
+  onAddWatched,
+}) {
   const [movieDetail, setMovieDetail] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [userRate, setUserRate] = useState("");
+  const [userRate, setUserRate] = useState(null);
+  const isWatched = watched.map((movie) => movie.id).includes(movieId);
+  const watchedUserrate = watched.find(
+    (movie) => movie.id === movieId
+  )?.userRate;
+
   const {
     original_title: title,
     overview: description,
@@ -38,6 +48,24 @@ export default function MovieDetails({ movieId, onCloseMove, onAddWatched }) {
 
   useEffect(
     function () {
+      function callback(e) {
+        if (e.code === "Escape") onCloseMove();
+      }
+      document.addEventListener("keydown", callback);
+
+      //clean up the event lis, from the DOM.
+      //to prevent duplication of same event of the same DOM.
+      //so it will be executed many time.
+      //remove event must be same of adding it!.
+      return () => {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMove]
+  );
+
+  useEffect(
+    function () {
       setIsLoading(true);
 
       try {
@@ -57,6 +85,19 @@ export default function MovieDetails({ movieId, onCloseMove, onAddWatched }) {
       }
     },
     [movieId]
+  );
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = title;
+
+      //clean up function, run when the component instance unmounted!.
+      return () => {
+        document.title = "usePopcorn";
+      };
+    },
+    [title]
   );
 
   if (movieDetail) {
@@ -90,15 +131,25 @@ export default function MovieDetails({ movieId, onCloseMove, onAddWatched }) {
             </header>
             <section>
               <div className="rating">
-                <StarRating
-                  maxRating={10}
-                  size={24}
-                  onSetRating={setUserRate}
-                />
-                {userRate && (
-                  <button className="btn-add" onClick={handleAdd}>
-                    + Add to list
-                  </button>
+                {!isWatched ? (
+                  <>
+                    <StarRating
+                      maxRating={10}
+                      size={24}
+                      onSetRating={setUserRate}
+                      defaultRating={userRate}
+                    />
+                    {userRate && (
+                      <button className="btn-add" onClick={handleAdd}>
+                        + Add to list
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p>
+                    You are aleady rate it with {watchedUserrate}{" "}
+                    <span>⭐</span>
+                  </p>
                 )}
               </div>
               <p>

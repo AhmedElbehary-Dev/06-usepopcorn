@@ -33,7 +33,12 @@ export default function App() {
     setWatched((watched) => [...watched, movie]);
   }
 
+  function handleDeleteWateched(movieId) {
+    setWatched((watched) => watched.filter((movie) => movie.id !== movieId));
+  }
+
   useEffect(() => {
+    const controller = new AbortController();
     /*
       useEffect will be called after the component rendered, 
       self callback fetchMovies async function, which it dealing with
@@ -46,7 +51,8 @@ export default function App() {
 
         const result = await fetch(
           `${baseURL}query=${query}&include_adult=false&page=1`,
-          options
+          options,
+          { singal: controller.signal }
         ).catch((error) => {
           throw new Error("Something wrong happened, while fetching movies!");
         });
@@ -57,7 +63,9 @@ export default function App() {
         setMovies(data.results);
         setIsLoading(false);
       } catch (err) {
-        setErrorMessage(err.message);
+        if (err.name !== "AbortError") {
+          setErrorMessage(err.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -68,13 +76,21 @@ export default function App() {
       return;
     }
     fetchMovies();
+
+    return () => {
+      controller.abort();
+    };
   }, [query]);
 
   return (
     <>
       <Nav>
         <Logo />
-        <Search query={query} setQuery={setQuery} />
+        <Search
+          query={query}
+          setQuery={setQuery}
+          onCloseMove={handleCloseMovie}
+        />
         <NumResults movies={movies} />
       </Nav>
       <Main>
@@ -90,13 +106,17 @@ export default function App() {
           {selectedId ? (
             <MovieDetails
               movieId={selectedId}
+              watched={watched}
               onCloseMove={handleCloseMovie}
               onAddWatched={handleAddWatched}
             />
           ) : (
             <>
               <WatchedSummery watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatched={handleDeleteWateched}
+              />
             </>
           )}
         </Box>

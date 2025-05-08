@@ -1,5 +1,9 @@
 import { fixedFloat } from "../config";
-export default function WatchedMovie({ movie }) {
+export default function WatchedMovie({ movie, onDeleteWatched }) {
+  function handleDeleteWatched() {
+    onDeleteWatched(movie.id);
+  }
+
   return (
     <li>
       <img
@@ -20,6 +24,10 @@ export default function WatchedMovie({ movie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+
+        <button className="btn-delete" onClick={handleDeleteWatched}>
+          X
+        </button>
       </div>
     </li>
   );

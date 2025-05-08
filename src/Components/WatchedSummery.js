@@ -1,4 +1,4 @@
-import { average } from "../config";
+import { average, fixedFloat } from "../config";
 
 export default function WatchedSummery({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.rate.toFixed(1)));
@@ -16,15 +16,15 @@ export default function WatchedSummery({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{fixedFloat(avgImdbRating)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{fixedFloat(avgUserRating)}</span>
         </p>
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>{fixedFloat(avgRuntime)} min</span>
         </p>
       </div>
     </div>

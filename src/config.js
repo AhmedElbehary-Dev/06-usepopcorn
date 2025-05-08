@@ -14,7 +14,7 @@ export const baseURL = "https://api.themoviedb.org/3/search/movie?";
 export const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-export function fixedNumber(value) {
+export function fixedFloat(value) {
   if (value == null) return "";
   return value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
 }
