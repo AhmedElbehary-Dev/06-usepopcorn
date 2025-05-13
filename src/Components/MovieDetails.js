@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
 import { options } from "../config";
+import { useKey } from "../Hooks/useKey";
 
 export default function MovieDetails({
   movieId,
@@ -46,23 +47,8 @@ export default function MovieDetails({
     onCloseMove();
   }
 
-  useEffect(
-    function () {
-      function callback(e) {
-        if (e.code === "Escape") onCloseMove();
-      }
-      document.addEventListener("keydown", callback);
+  useKey("Escape", onCloseMove);
 
-      //clean up the event lis, from the DOM.
-      //to prevent duplication of same event of the same DOM.
-      //so it will be executed many time.
-      //remove event must be same of adding it!.
-      return () => {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-    [onCloseMove]
-  );
 
   useEffect(
     function () {
